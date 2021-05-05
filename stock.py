@@ -15,11 +15,20 @@ class Stock():
         """
         self.symbol = symbol
 
-    def get_historical_data(self, period = '2y', interval = '1d'):
+    def get_data(self, period = '2y', interval = '1d'):
         """
         Get the historical stock data using the yfinance API
         """
         stock = yf.Ticker(self.symbol)
-        return stock.history(period = period, interval = interval)
+        df = stock.history(period = period, interval = interval)
+        df = ta.add_all_ta_features(df, 'Open', 'High', 'Low', 'Close', 'Volume', fillna = True)
+
+        return df
+    
+    def get_train_test(df):
+        train_length = int(len(df) * 0.8)
+
+        train = df.iloc[:train_length, :]
+        test = df.iloc[train_length:, :]
         
     
