@@ -21,14 +21,15 @@ class Stock():
         """
         stock = yf.Ticker(self.symbol)
         df = stock.history(period = period, interval = interval)
+        df.dropna(inplace = True)
         df = ta.add_all_ta_features(df, 'Open', 'High', 'Low', 'Close', 'Volume', fillna = True)
+        df.drop(['Open', 'High', 'Low', 'Volume', 'Dividends', 'Stock Splits'], axis = 1, inplace = True)
 
         return df
     
-    def get_train_test(df):
+    def get_train_test(self, df):
         train_length = int(len(df) * 0.8)
 
         train = df.iloc[:train_length, :]
         test = df.iloc[train_length:, :]
-        
     
