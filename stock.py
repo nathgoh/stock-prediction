@@ -3,10 +3,10 @@ import pandas as pd
 import numpy as np
 import ta
 
-import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from sklearn import preprocessing
+# import tensorflow as tf
+# from tensorflow import keras
+# from tensorflow.keras import layers
+# from sklearn import preprocessing
 
 class Stock():
     def __init__(self, symbol):
@@ -45,14 +45,18 @@ class Stock():
         # Scaling the features
         # scaled_close_prices = preprocessing.RobustScaler()
         # scaled_close_prices.fit(df[['Close']])
+        # scaled_df = preprocessing.RobustScaler()
+        # df = pd.DataFrame(scaled_df.fit_transform(df), columns = df.columns, index = df.index)
 
-        scaled_df = preprocessing.RobustScaler()
-        df = pd.DataFrame(scaled_df.fit_transform(df), columns = df.columns, index = df.index)
+        df_closed = df[['Close']]
 
-        return df
+        return df_closed
     
     def get_train_test(self, df):
         forecast = 30 # How many days we want to predict into the future
 
-        y = 
+        df["Prediction"] = df[['Close']].shift(-forecast)
+
+        print(df)
+         
     
