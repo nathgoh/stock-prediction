@@ -3,10 +3,8 @@ import pandas as pd
 import numpy as np
 import ta
 
-# import tensorflow as tf
-# from tensorflow import keras
-# from tensorflow.keras import layers
-# from sklearn import preprocessing
+from sklearn import preprocessing
+from sklearn.model_selection import train_test_split
 
 class Stock():
     def __init__(self, symbol):
@@ -50,13 +48,24 @@ class Stock():
 
         df_closed = df[['Close']]
 
-        return df_closed
+        return df
     
     def get_train_test(self, df):
+        df_array = df.to_numpy()
+        train_forecast = 120 # How many days of past data you want to train for forecasting
         forecast = 30 # How many days we want to predict into the future
 
-        df["Prediction"] = df[['Close']].shift(-forecast)
+        X, y = [], []
+        for j in range(len(df_array)):
+            train_end = j + train_forecast
+            end = train_end + forecast
 
-        print(df)
-         
+            if end > len(df_array):
+                break
+
+            X.append(df_array[j:train_end, :])
+            y.append(df_array[train_end:end, 0])
+
+        return train_test_split(X, y, test_size = 0.2)
+      
     
