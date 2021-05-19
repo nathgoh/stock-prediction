@@ -1,4 +1,5 @@
 from stock import Stock
+import yfinance as yf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,41 +15,59 @@ tf.config.experimental.set_memory_growth(physical_devices[0], enable=True)
 
 def main():
 
-    # stock_symbol = input("Enter stock symbol: ")
-    stock = Stock('SPY')
+    # Get input of what stock you want to predict
+    stock_symbol = input("Enter stock symbol: ")
+    stock = Stock(stock_symbol.upper())
+
+    # Get actual name associated with the stock symbol
+    stock_name = yf.Ticker(stock_symbol)
+    stock_name = stock_name.info['longName']
+
+    # Get stock data
     df = stock.get_data()
-
     df = df[['Close']]
+    num_features = df.shape[1]
 
+    # Get the dates associated with the train and test datasets
     train_dates = df.index[:int(df.shape[0] * 0.8)]
     test_dates = df.index[int(df.shape[0] * 0.8):]
 
-    num_features = df.shape[1]
+    # Split into train and test datasets
     train_df = np.array(df[:int(df.shape[0] * 0.8)])
     test_df = np.array(df[int(df.shape[0] * 0.8):])
 
+    # Do some scaling
     scaler = preprocessing.RobustScaler()
     train_df = scaler.fit_transform(train_df)
     test_df = scaler.transform(test_df)
 
+    # Get the data for each datasets
     X_train, y_train, used_dates_train = create_dataset(train_df, train_dates)
     X_test, y_test, used_dates_test = create_dataset(test_df, test_dates)
 
+    # Training
     model = make_model(num_features)
     callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-5, patience=8)
     history = model.fit(X_train, y_train, epochs = 50, batch_size = 64, validation_data=(X_test, y_test), callbacks = [callback])
  
+    # Prediction on test set
     predictions = model.predict(X_test)
     predictions = scaler.inverse_transform(predictions)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
 
-    plot_data(predictions, y_test, used_dates_test)
+    plot_data(predictions, y_test, used_dates_test, stock_name)
 
-def plot_data(predictions, y_test, dates):
+def plot_data(predictions, y_test, dates, stock_name):
+
+    predictions = pd.DataFrame(predictions, index = dates)
+    y_test = pd.DataFrame(y_test, index = dates)
+
     fig, axes = plt.subplots(figsize=(16, 8))
     axes.plot(y_test, color = 'red', label = 'Original Price')
     plt.plot(predictions, color = 'cyan', label = 'Predicted Price')
+    plt.title(stock_name + ": Prediction vs Actual Prices")
     plt.ylabel("Price (USD)")
+    plt.xlabel("Date")
     plt.legend()
     plt.show()
 
@@ -112,6 +131,5 @@ def make_model(num_features, look_back = 90):
 
     return model
       
-
 if __name__ == '__main__':
     main()
