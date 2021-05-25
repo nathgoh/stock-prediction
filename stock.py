@@ -14,7 +14,7 @@ class Stock():
         """
         self.symbol = symbol
 
-    def get_data(self, period = '10y', interval = '1d'):
+    def get_data(self, period = '12y', interval = '1d'):
         """
         Get the historical stock data using the yfinance API
         Then pre-process data to be used for training and testing

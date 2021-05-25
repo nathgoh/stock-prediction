@@ -100,7 +100,7 @@ def make_model(num_features, look_back = 120):
     model = Sequential()    
 
     model.add(layers.LSTM(
-        units = 128, 
+        units = 256, 
         activation= 'tanh',
         return_sequences = True,
         input_shape = (look_back, num_features)
@@ -131,7 +131,7 @@ def make_model(num_features, look_back = 120):
     model.add(layers.Dropout(0.2))
 
     model.add(layers.LSTM(
-        units = 128, 
+        units = 64, 
         activation = 'relu'
         ))
 
