@@ -3,6 +3,7 @@ import yfinance as yf
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from datetime import date, timedelta
 
 import sklearn.preprocessing as preprocessing
 import tensorflow as tf
@@ -35,6 +36,7 @@ def main():
     # Split into train and test datasets
     train_df = np.array(df[:int(df.shape[0] * 0.8)])
     test_df = np.array(df[int(df.shape[0] * 0.8):])
+    all_df = np.array(df)
 
     # Do some scaling
     scaler = preprocessing.RobustScaler()
@@ -47,13 +49,21 @@ def main():
 
     # Training
     model = make_model(num_features)
-    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-5, patience=8)
-    history = model.fit(X_train, y_train, epochs = 50, batch_size = 64, validation_data=(X_test, y_test), callbacks = [callback])
+    callback = tf.keras.callbacks.EarlyStopping(monitor='val_loss', min_delta=1e-6, patience=5)
+    history = model.fit(X_train, y_train, epochs = 30, batch_size = 64, validation_data=(X_test, y_test), callbacks = [callback])
  
     # Prediction on test set
     predictions = model.predict(X_test)
     predictions = scaler.inverse_transform(predictions)
     y_test = scaler.inverse_transform(y_test.reshape(-1, 1))
+
+    # Prediction of the next day of the stock market
+    X_test_forecast = [all_df[-120:, :]]
+    X_test_forecast = np.array(X_test_forecast)
+    predicted_price = model.predict(X_test_forecast)
+    predicted_price = scaler.inverse_transform(predicted_price)
+    print("{} Today's Price on {}: {}".format(stock_name, date.today(), all_df[-1, 0]))
+    print("{} Tomorrow's Predicted Price on {}: {}".format(stock_name, date.today() + timedelta(days=1), round(predicted_price[0, 0], 2)))
 
     plot_data(predictions, y_test, used_dates_test, stock_name)
 
@@ -71,7 +81,7 @@ def plot_data(predictions, y_test, dates, stock_name):
     plt.legend()
     plt.show()
 
-def create_dataset(df, dates, look_back = 90):    
+def create_dataset(df, dates, look_back = 120):    
     X, y, used_dates = [], [], []
 
     for j in range(look_back, df.shape[0]):
@@ -81,22 +91,23 @@ def create_dataset(df, dates, look_back = 90):
 
     X = np.array(X)
     y = np.array(y)
+
     used_dates = np.array(used_dates)
 
     return X, y, used_dates
 
-def make_model(num_features, look_back = 90):
+def make_model(num_features, look_back = 120):
     model = Sequential()    
 
     model.add(layers.LSTM(
-        units = 120, 
+        units = 128, 
         activation= 'tanh',
         return_sequences = True,
         input_shape = (look_back, num_features)
         ))
 
     model.add(layers.LSTM(
-        units = 120, 
+        units = 128, 
         activation = 'tanh',
         return_sequences = True,
         ))
@@ -104,7 +115,7 @@ def make_model(num_features, look_back = 90):
     model.add(layers.Dropout(0.2))
 
     model.add(layers.LSTM(
-        units = 120, 
+        units = 128, 
         activation = 'tanh',
         return_sequences = True,
         ))
@@ -112,7 +123,7 @@ def make_model(num_features, look_back = 90):
     model.add(layers.Dropout(0.2))
 
     model.add(layers.LSTM(
-        units = 120, 
+        units = 128, 
         activation = 'tanh',
         return_sequences = True,
         ))
@@ -120,8 +131,8 @@ def make_model(num_features, look_back = 90):
     model.add(layers.Dropout(0.2))
 
     model.add(layers.LSTM(
-        units = 120, 
-        activation = 'tanh'
+        units = 128, 
+        activation = 'relu'
         ))
 
     model.add(layers.Dense(1))
