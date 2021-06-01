@@ -15,7 +15,7 @@ Python main code file that will format the data into their train and test datase
 Also does the model building, training, testing, and next day stock price prediction.
 
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`def main()` \
-&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Main body of code that will create the 80/20 split of training and testing datasets. Our training feature of this model will just be the &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;closing prices of the  stock. In addition, the data will be scaled using `RobustScalar()` in hopes that spikes in stock prices won't &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;skewed the training too much.
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Main body of code that will create the 80/20 split of training and testing datasets. Our training feature of this model will just be the &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;closing prices of the stock. In addition, the data will be scaled using `RobustScalar()` in hopes that spikes in stock prices won't skewed the training too much.
  
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`def plot_data()` \
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Function to graph prediction stock prices vs actual stock prices. 
