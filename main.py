@@ -68,7 +68,7 @@ def main():
     plot_data(predictions, y_test, used_dates_test, stock_name)
 
 def plot_data(predictions, y_test, dates, stock_name):
-
+    # Plot the predicted stock prices vs their stock actual prices 
     predictions = pd.DataFrame(predictions, index = dates)
     y_test = pd.DataFrame(y_test, index = dates)
 
@@ -82,6 +82,7 @@ def plot_data(predictions, y_test, dates, stock_name):
     plt.show()
 
 def create_dataset(df, dates, look_back = 120):    
+    # Dataset creation function
     X, y, used_dates = [], [], []
 
     for j in range(look_back, df.shape[0]):
@@ -97,6 +98,7 @@ def create_dataset(df, dates, look_back = 120):
     return X, y, used_dates
 
 def make_model(num_features, look_back = 120):
+    # Model structure
     model = Sequential()    
 
     model.add(layers.LSTM(
