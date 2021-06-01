@@ -5,7 +5,7 @@
 An LSTM architecture is used for the model. LSTM or Long-Short-Term-Memory is a type of recurrent neural network architecture.
 LSTMs are well-suited for making predictions based on time-series data and thus a suitable architecture choice for this task of prediction stock prices.
 
-Training and testing data is derived from 12 years of historical stock data.
+Training and testing data are derived from 12 years of historical stock data.
 
 ## Run
 Clone the repository and run `pip install -r requirements.txt`
